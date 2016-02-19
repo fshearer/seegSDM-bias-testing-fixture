@@ -2,7 +2,7 @@ library(raster)
 library(sp)
 ## This is fork of runABRAID from SEEG-Oxford/seegSDM @ 0.1-8
 runTest <- function (mode, 
-                     disease_type,
+                     disease_type, # used with "filter_bias"
                      occurrence_path,
                      extent_path,
                      supplementary_occurrence_path,
@@ -10,9 +10,10 @@ runTest <- function (mode,
                      covariate_path,
                      discrete,
                      water_mask,
-                     crop_bias=TRUE,
-                     filter_bias=TRUE,
-                     use_weights=TRUE) {
+                     crop_bias=TRUE, # used with mode "bias"
+                     filter_bias=TRUE, # used with mode "bias"
+                     use_weights=TRUE,
+                     use_temporal_covariates=TRUE) {
 
   # Functions to assist in the loading of raster data. 
   # This works around the truncation of crs metadata in writen geotiffs.
@@ -42,6 +43,13 @@ runTest <- function (mode,
   
   # load the admin rasters as a stack
   admin <- abraidStack(admin_path)
+  
+  if (!use_temporal_covariates) {
+    # For our data sets selectLatestCovariates is simple enough (will pick 2012 layer),
+    # for more complex covariate sets a better approach may be nessesary
+    # load_stack = noop, we just want the strings
+    covariate_path <- selectLatestCovariates(covariate_path, load_stack=function(x) { return (x) })
+  }
   
   # get the required number of cpus
   nboot <- 64
