@@ -11,7 +11,8 @@ runTest <- function (mode,
                      discrete,
                      water_mask,
                      crop_bias=TRUE,
-                     filter_bias=TRUE) {
+                     filter_bias=TRUE,
+                     use_weights=TRUE) {
 
   # Functions to assist in the loading of raster data. 
   # This works around the truncation of crs metadata in writen geotiffs.
@@ -142,21 +143,37 @@ runTest <- function (mode,
   
   cat('extraction done\n\n')
 
-  # balance weights
-  data_list <- sfLapply(data_list, balanceWeights)
-  cat('balance done\n\n')
-
-  # run BRT submodels in parallel
-  model_list <- sfLapply(data_list,
-                         runBRT,
-                         wt = 'Weight',
-                         gbm.x = names(covariate_path),
-                         gbm.y = 'PA',
-                         pred.raster = selectLatestCovariates(covariate_path, load_stack=abraidStack),
-                         gbm.coords = c('Longitude', 'Latitude'),
-                         verbose = TRUE)
-  
-  cat('model fitting done\n\n')
+  if (use_weights) {
+    # balance weights
+    data_list <- sfLapply(data_list, balanceWeights)
+    cat('balance done\n\n')
+    
+    # run BRT submodels in parallel
+    model_list <- sfLapply(data_list,
+                           runBRT,
+                           wt = 'Weight',
+                           gbm.x = names(covariate_path),
+                           gbm.y = 'PA',
+                           pred.raster = selectLatestCovariates(covariate_path, load_stack=abraidStack),
+                           gbm.coords = c('Longitude', 'Latitude'),
+                           verbose = TRUE)
+    cat('model fitting done (with weights)\n\n')
+  } else {
+    # balance weights
+    data_list <- lapply(data_list, function (extracted_batch) {
+      return (extracted_batch[, names(extracted_batch) != 'Weight', drop=FALSE])
+    })
+    
+    # run BRT submodels in parallel
+    model_list <- sfLapply(data_list,
+                           runBRT,
+                           gbm.x = names(covariate_path),
+                           gbm.y = 'PA',
+                           pred.raster = selectLatestCovariates(covariate_path, load_stack=abraidStack),
+                           gbm.coords = c('Longitude', 'Latitude'),
+                           verbose = TRUE)
+    cat('model fitting done (without weights)\n\n')
+  }
 
   # get cross-validation statistics in parallel
   stat_lis <- sfLapply(model_list,
