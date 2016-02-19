@@ -1,7 +1,11 @@
 library(raster)
 library(sp)
+library(devtools)
+install_github("SEEG-Oxford/seegSDM", ref="0.1-8")
+library(seegSDM)
 ## This is fork of runABRAID from SEEG-Oxford/seegSDM @ 0.1-8
-runTest <- function (mode, 
+runTest <- function (name,
+                     mode, 
                      disease,
                      admin_extract_mode="random",
                      crop_bias=TRUE, # used with mode "bias"
@@ -9,25 +13,130 @@ runTest <- function (mode,
                      use_weights=TRUE,
                      use_temporal_covariates=TRUE) {
   # Get file paths
-  occurrence_path <- "data/occurrences.csv"
-  extent_path <- "data/temp.csv"
-  supplementary_occurrence_path <- "data/supplementary_occurrences.csv"
+  occurrence_path <- paste0(disease,"_data/occurrences.csv")
+  extent_path <- paste0(disease,"_data/extent.tif")
+  supplementary_occurrence_path <- paste0(disease,"_data/supplementary_occurrences.csv")
   admin_path <- list(
     "admin0" <- "admins/admin0.tif",
     "admin1" <- "admins/admin1.tif",
     "admin2" <- "admins/admin2.tif",
     "admin3" <- "admins/admin2.tif" # This one wont be used, but is needed for compatablity with older bits of seegSDM
   )
-  water_mask <- "data/waterbodies.tif"
+  water_mask <- "admins/waterbodies.tif"
   disease_type <- list(
-    
+    "cchf"="virus",
+    "chik"="virus",
+    "deng"="virus",
+    "hat"="parasite",
+    "melio"="bacteria",
+    "nwcl"="parasite",
+    "nwvl"="parasite",
+    "owcl"="parasite",
+    "owvl"="parasite",
+    "scrub"="bacteria"
   )[[disease]]
-  covariate_path <- list(
-    
-  )[[disease]]
-  discrete <- list(
-    
-  )[[disease]]
+  
+  all_covs <- list(
+    "access"= "covariates/access.tif",
+    "c10"=list(
+      "2001"="covariates/2001.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2002"="covariates/2002.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2003"="covariates/2003.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2004"="covariates/2004.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2005"="covariates/2005.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2006"="covariates/2006.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2007"="covariates/2007.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2008"="covariates/2008.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2009"="covariates/2009.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2010"="covariates/2010.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2011"="covariates/2011.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2012"="covariates/2012.Class10_Grasslands.5km.Percentage.ABRAID.tif"
+    ),
+    "c6"=list(
+      "2001"="covariates/2001.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2002"="covariates/2002.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2003"="covariates/2003.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2004"="covariates/2004.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2005"="covariates/2005.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2006"="covariates/2006.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2007"="covariates/2007.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2008"="covariates/2008.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2009"="covariates/2009.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2010"="covariates/2010.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2011"="covariates/2011.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
+      "2012"="covariates/2012.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif"
+    ),
+    "c7"=list(
+      "2001"="covariates/2001.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2002"="covariates/2002.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2003"="covariates/2003.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2004"="covariates/2004.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2005"="covariates/2005.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2006"="covariates/2006.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2007"="covariates/2007.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2008"="covariates/2008.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2009"="covariates/2009.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2010"="covariates/2010.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2011"="covariates/2011.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
+      "2012"="covariates/2012.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif"
+    ),
+    "evi_mean"="covariates/EVI_Fixed_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "evi_sd"="covariates/EVI_Fixed_SD_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "gecon"="covariates/gecon.tif",
+    "lst_day_mean"="covariates/LST_Day_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "lst_day_sd"="covariates/LST_Day_SD_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "lst_night_mean"="covariates/LST_Night_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "lst_night_sd"="covariates/LST_Night_SD_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "prec57mn"="covariates/prec57mn.tif",
+    "prec57mx"="covariates/prec57mx.tif",
+    "tcb_mean"="covariates/TCB_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "tcw_mean"="covariates/TCW_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
+    "tempsuit"="covariates/tempsuit.tif",
+    "upr_p"="covariates/upr_p.tif",
+    "upr_u"="covariates/upr_u.tif",
+    "wd0107mn"="covariates/wd0107mn.tif",
+    "wd0107mx"="covariates/wd0107mx.tif",
+    "wd0114a0"="covariates/wd0114a0.tif"
+  )
+  all_discrete <- list(
+    "access"=FALSE,
+    "c10"=FALSE,
+    "c6"=FALSE,
+    "c7"=FALSE,
+    "evi_mean"=FALSE,
+    "evi_sd"=FALSE,
+    "gecon"=FALSE,
+    "lst_day_mean"=FALSE,
+    "lst_day_sd"=FALSE,
+    "lst_night_mean"=FALSE,
+    "lst_night_sd"=FALSE,
+    "prec57mn"=FALSE,
+    "prec57mx"=FALSE,
+    "tcb_mean"=FALSE,
+    "tcw_mean"=FALSE,
+    "tempsuit"=FALSE,
+    "upr_p"=TRUE,
+    "upr_u"=TRUE,
+    "wd0107mn"=FALSE,
+    "wd0107mx"=FALSE,
+    "wd0114a0"=FALSE
+  )
+
+  covariate_diseases <- list(
+    "cchf"=c("c10", "c6", "c7", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "tcb_mean", "tcw_mean"),
+    "chik"=c(),
+    "deng"=c("access", "gecon", "prec57mn", "prec57mx", "tempsuit", "upr_p", "upr_u", "wd0114a0"),
+    "hat"=c(),
+    "melio"=c(),
+    "nwcl"=c("prec57mn", "prec57mx", "upr_p", "wd0107mn", "wd0107mx"),
+    "nwvl"=c(),
+    "owcl"=c(),
+    "owvl"=c(),
+    "scrub"=c()
+  )
+  
+  covariate_path <- all_covs[covariate_diseases[[disease]]]
+  discrete <- all_discrete[covariate_diseases[[disease]]]
   
   # Functions to assist in the loading of raster data. 
   # This works around the truncation of crs metadata in writen geotiffs.
@@ -72,7 +181,7 @@ runTest <- function (mode,
   sfInit(parallel = TRUE, cpus = nboot)
   
   # load seegSDM and dependencies on every cluster
-  sfClusterCall(load_seegSDM)
+  sfLibrary(seegSDM)
 
   cat('\nseegSDM loaded on cluster\n\n')
 
@@ -226,7 +335,7 @@ runTest <- function (mode,
   # combine and output results
   
   # make a results directory
-  dir.create('results')
+  dir.create(paste0(name, '/results'))
   
   # cross-validation statistics (with pairwise-weighted distance sampling)
   stats <- do.call("rbind", stat_lis)
@@ -237,7 +346,7 @@ runTest <- function (mode,
   
   # write stats to disk
   write.csv(stats,
-            'results/statistics.csv',
+            paste0(name,'/results/statistics.csv'),
             na = "",
             row.names = FALSE)
   
@@ -249,7 +358,7 @@ runTest <- function (mode,
   
   # output this file
   write.csv(relinf,
-            'results/relative_influence.csv',
+            paste0(name,'/results/relative_influence.csv'),
             na = "",
             row.names = FALSE)
   
@@ -288,7 +397,7 @@ runTest <- function (mode,
   
   # save the results
   write.csv(effects,
-            'results/effect_curves.csv',
+            paste0(name,'/results/effect_curves.csv'),
             na = "",
             row.names = FALSE)
   
@@ -312,7 +421,7 @@ runTest <- function (mode,
   
   # save the mean predicitons and uncerrtainty as rasters
   writeRaster(preds[[1]],
-              'results/mean_prediction',
+              paste0(name,'/results/mean_prediction'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -320,14 +429,105 @@ runTest <- function (mode,
               overwrite = TRUE)
   
   writeRaster(uncertainty,
-              'results/prediction_uncertainty',
+              paste0(name,'/results/prediction_uncertainty'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
                           "ZLEVEL=9"),
               overwrite = TRUE)
   
-  ##TODO add crop/mask
+  ###crop/mask
+  water <- abraidRaster(water_mask)
+  mean <- preds[[1]]
+  mean <- mask(mean, extent, maskvalue=-100, updatevalue=9999)
+  uncertainty <- mask(uncertainty, extent, maskvalue=-100, updatevalue=9999)
+  mean <- mask(mean, water, inverse=TRUE)
+  uncertainty <- mask(uncertainty, water, inverse=TRUE)
+  
+  writeRaster(mean,
+              paste0(name,'/results/mean_prediction_masked'),
+              format = 'GTiff',
+              NAflag = -9999,
+              options = c("COMPRESS=DEFLATE",
+                          "ZLEVEL=9"),
+              overwrite = TRUE)
+  
+  writeRaster(uncertainty,
+              paste0(name,'/results/prediction_uncertainty_masked'),
+              format = 'GTiff',
+              NAflag = -9999,
+              options = c("COMPRESS=DEFLATE",
+                          "ZLEVEL=9"),
+              overwrite = TRUE)
+  
+  cols <- colorRampPalette(c('#91ab84', '#c3d4bb', '#ffffcb', '#cf93ba', '#a44883'))
+  
+  png(paste0(name,'/results/mean_prediction_masked.png'),
+      width = 1656,
+      height = 667)
+  
+  par(mfrow=c(1,1), 
+      mar = c(0, 0, 0, 0),
+      oma = rep(0, 4))
+  plot(mean,
+       zlim = c(9999, 9999),
+       col = colorRampPalette(c('#eaeaea', '#eaeaea'))(2),
+       axes = FALSE,
+       box = FALSE,
+       legend=FALSE)
+  plot(mean,
+       zlim = c(0, 1),
+       col = cols(1000),
+       axes = FALSE,
+       box = FALSE,
+       legend=FALSE,
+       add=TRUE)
+  
+  dev.off()
+  
+  png(paste0(name,'/results/prediction_uncertainty_masked.png'),
+      width = 1656,
+      height = 667)
+  
+  par(mfrow=c(1,1), 
+      mar = c(0, 0, 0, 0),
+      oma = rep(0, 4))
+  plot(uncertainty,
+       zlim = c(9999, 9999),
+       col = colorRampPalette(c('#eaeaea', '#eaeaea'))(2),
+       axes = FALSE,
+       box = FALSE,
+       legend=FALSE)
+  plot(uncertainty,
+       zlim = c(0, 1),
+       col = cols(1000),
+       axes = FALSE,
+       box = FALSE,
+       legend=FALSE,
+       add=TRUE)
+  
+  dev.off()
+  
+  png(paste0(name,'/results/effects.png'),
+      width = 2000,
+      height = 2500,
+      pointsize = 30)
+  
+  par(mfrow = n2mfrow(length(covariate_path)))
+  
+  getEffectPlots(model_list, plot = TRUE)
+  
+  dev.off()
+  
+  write.csv(presence,
+            paste0(name,'/results/presence.csv'),
+            na = "",
+            row.names = FALSE)
+  
+  write.csv(absence,
+            paste0(name,'/results/absence.csv'),
+            na = "",
+            row.names = FALSE)
   
   # return an exit code of 0, as in the ABRAID-MP code
   return (0)
