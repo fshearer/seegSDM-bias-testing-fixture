@@ -139,7 +139,7 @@ runTest <- function (mode,
     } else {
       if (as.character(disease_type) %in% names(disease_filters)) {
         absence <- absence[absence$Disease %in% unlist(disease_filters, use.names=FALSE), ]
-        cat('filtered bias to disease subset\n\n')
+        cat('filtered bias to all classified diseases \n\n')
       }
     }
     
@@ -165,6 +165,16 @@ runTest <- function (mode,
                           admin = admin, 
                           factor = discrete,
                           admin_mode = admin_extract_mode)
+  } else if (mode == "uniform") {
+    presence <- occurrence
+    presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
+    selection_mask <- calc(extent, function (cells) {
+      return (ifelse(cells %in% c(100,50), 1, 0))
+    })
+    absence <- bgSample(selection_mask, n=nrow(presence), prob=crop_bias, replace=TRUE, spatial=FALSE)
+    absence <- xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
+    all <- rbind(presence, absence)
+    cat('random bias generated\n\n')
   } else {
     exit(1)
   }
