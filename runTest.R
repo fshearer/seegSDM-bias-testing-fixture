@@ -98,6 +98,7 @@ runTest <- function (name,
     "wd0107mx"="covariates/wd0107mx.tif",
     "wd0114a0"="covariates/wd0114a0.tif"
   )
+  
   all_discrete <- list(
     "access"=FALSE,
     "c10"=FALSE,
@@ -335,7 +336,7 @@ runTest <- function (name,
   # combine and output results
   
   # make a results directory
-  dir.create(paste0(name, '/results'))
+  dir.create(name)
   
   # cross-validation statistics (with pairwise-weighted distance sampling)
   stats <- do.call("rbind", stat_lis)
@@ -346,7 +347,7 @@ runTest <- function (name,
   
   # write stats to disk
   write.csv(stats,
-            paste0(name,'/results/statistics.csv'),
+            paste0(name,'/statistics.csv'),
             na = "",
             row.names = FALSE)
   
@@ -358,7 +359,7 @@ runTest <- function (name,
   
   # output this file
   write.csv(relinf,
-            paste0(name,'/results/relative_influence.csv'),
+            paste0(name,'/relative_influence.csv'),
             na = "",
             row.names = FALSE)
   
@@ -397,7 +398,7 @@ runTest <- function (name,
   
   # save the results
   write.csv(effects,
-            paste0(name,'/results/effect_curves.csv'),
+            paste0(name,'/effect_curves.csv'),
             na = "",
             row.names = FALSE)
   
@@ -421,7 +422,7 @@ runTest <- function (name,
   
   # save the mean predicitons and uncerrtainty as rasters
   writeRaster(preds[[1]],
-              paste0(name,'/results/mean_prediction'),
+              paste0(name,'/mean_prediction'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -429,7 +430,7 @@ runTest <- function (name,
               overwrite = TRUE)
   
   writeRaster(uncertainty,
-              paste0(name,'/results/prediction_uncertainty'),
+              paste0(name,'/prediction_uncertainty'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -445,7 +446,7 @@ runTest <- function (name,
   uncertainty <- mask(uncertainty, water, inverse=TRUE)
   
   writeRaster(mean,
-              paste0(name,'/results/mean_prediction_masked'),
+              paste0(name,'/mean_prediction_masked'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -453,7 +454,7 @@ runTest <- function (name,
               overwrite = TRUE)
   
   writeRaster(uncertainty,
-              paste0(name,'/results/prediction_uncertainty_masked'),
+              paste0(name,'/prediction_uncertainty_masked'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -462,7 +463,7 @@ runTest <- function (name,
   
   cols <- colorRampPalette(c('#91ab84', '#c3d4bb', '#ffffcb', '#cf93ba', '#a44883'))
   
-  png(paste0(name,'/results/mean_prediction_masked.png'),
+  png(paste0(name,'/mean_prediction_masked.png'),
       width = 1656,
       height = 667)
   
@@ -485,7 +486,7 @@ runTest <- function (name,
   
   dev.off()
   
-  png(paste0(name,'/results/prediction_uncertainty_masked.png'),
+  png(paste0(name,'/prediction_uncertainty_masked.png'),
       width = 1656,
       height = 667)
   
@@ -508,7 +509,7 @@ runTest <- function (name,
   
   dev.off()
   
-  png(paste0(name,'/results/effects.png'),
+  png(paste0(name,'/effects.png'),
       width = 2000,
       height = 2500,
       pointsize = 30)
@@ -520,12 +521,12 @@ runTest <- function (name,
   dev.off()
   
   write.csv(presence,
-            paste0(name,'/results/presence.csv'),
+            paste0(name,'/presence.csv'),
             na = "",
             row.names = FALSE)
   
   write.csv(absence,
-            paste0(name,'/results/absence.csv'),
+            paste0(name,'/absence.csv'),
             na = "",
             row.names = FALSE)
   
