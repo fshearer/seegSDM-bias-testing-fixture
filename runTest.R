@@ -46,11 +46,9 @@ runTest <- function (mode,
   
   # get the required number of cpus
   nboot <- 64
-  ncpu <- nboot
-  
+
   # start the cluster
-  sfInit(parallel = TRUE,
-         cpus = ncpu)
+  sfInit(parallel = TRUE, cpus = nboot)
   
   # load seegSDM and dependencies on every cluster
   sfClusterCall(load_seegSDM)
