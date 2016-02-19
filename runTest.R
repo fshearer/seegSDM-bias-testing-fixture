@@ -2,20 +2,33 @@ library(raster)
 library(sp)
 ## This is fork of runABRAID from SEEG-Oxford/seegSDM @ 0.1-8
 runTest <- function (mode, 
-                     disease_type, # used with "filter_bias"
-                     occurrence_path,
-                     extent_path,
-                     supplementary_occurrence_path,
-                     admin_path,
-                     covariate_path,
-                     discrete,
-                     water_mask,
+                     disease,
                      admin_extract_mode="random",
                      crop_bias=TRUE, # used with mode "bias"
                      filter_bias=TRUE, # used with mode "bias"
                      use_weights=TRUE,
                      use_temporal_covariates=TRUE) {
-
+  # Get file paths
+  occurrence_path <- "data/occurrences.csv"
+  extent_path <- "data/temp.csv"
+  supplementary_occurrence_path <- "data/supplementary_occurrences.csv"
+  admin_path <- list(
+    "admin0" <- "admins/admin0.tif",
+    "admin1" <- "admins/admin1.tif",
+    "admin2" <- "admins/admin2.tif",
+    "admin3" <- "admins/admin2.tif" # This one wont be used, but is needed for compatablity with older bits of seegSDM
+  )
+  water_mask <- "data/waterbodies.tif"
+  disease_type <- list(
+    
+  )[[disease]]
+  covariate_path <- list(
+    
+  )[[disease]]
+  discrete <- list(
+    
+  )[[disease]]
+  
   # Functions to assist in the loading of raster data. 
   # This works around the truncation of crs metadata in writen geotiffs.
   abraidCRS <- crs("+init=epsg:4326")
