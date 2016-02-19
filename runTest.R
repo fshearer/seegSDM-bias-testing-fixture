@@ -114,14 +114,6 @@ runTest <- function (mode,
     absence <- supplementary_occurrence
     absence <- occurrence2SPDF(cbind(PA=0, absence@data[, 1:2], Weight=1, absence@data[, 3:6]), crs=abraidCRS)
     
-    if (crop_bias) {
-      # Filter to consensus
-      absence_consensus <- extractBatch(absence, list("consensus"=extent), list("consensus"=TRUE), admin, admin_mode="latlong", load_stack=abraidStack)
-      absence_cropped <- !is.na(absence_consensus$consensus) & (absence_consensus$consensus == 100 | absence_consensus$consensus == 50)
-      absence <- absence[absence_cropped, ]
-      cat('filtered bias to extent\n\n')
-    }
-    
     if (filter_bias) {
       # Filter by disease type
       disease_filters <- list(
@@ -131,8 +123,21 @@ runTest <- function (mode,
         absence <- absence[absence$Disease %in% disease_filters[[disease_type]], ]
         cat('filtered bias to disease subset\n\n')
       }
+    } else {
+      if (as.character(disease_type) %in% names(disease_filters)) {
+        absence <- absence[absence$Disease %in% unlist(disease_filters, use.names=FALSE), ]
+        cat('filtered bias to disease subset\n\n')
+      }
     }
     
+    if (crop_bias) {
+      # Filter to consensus
+      absence_consensus <- extractBatch(absence, list("consensus"=extent), list("consensus"=TRUE), admin, admin_mode="latlong", load_stack=abraidStack)
+      absence_cropped <- !is.na(absence_consensus$consensus) & (absence_consensus$consensus == 100 | absence_consensus$consensus == 50)
+      absence <- absence[absence_cropped, ]
+      cat('filtered bias to extent\n\n')
+    }
+
     all <- rbind(presence, absence)
     
     # create batches
