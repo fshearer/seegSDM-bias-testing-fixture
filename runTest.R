@@ -34,10 +34,6 @@ runTest <- function (mode,
   occurrence <- read.csv(occurrence_path, stringsAsFactors = FALSE)
   occurrence <- occurrence2SPDF(occurrence, crs=abraidCRS)
   
-  # occurrence data
-  supplementary_occurrence <- read.csv(supplementary_occurrence_path, stringsAsFactors = FALSE)
-  supplementary_occurrence <- occurrence2SPDF(supplementary_occurrence, crs=abraidCRS)
-  
   # load the definitve extent raster
   extent <- abraidRaster(extent_path)
   
@@ -96,6 +92,10 @@ runTest <- function (mode,
                           load_stack = abraidStack)
     cat('extractBhatt done\n\n')
   } else if (substr(mode, 1, 4) == "bias") {
+    # Load bias data
+    supplementary_occurrence <- read.csv(supplementary_occurrence_path, stringsAsFactors = FALSE)
+    supplementary_occurrence <- occurrence2SPDF(supplementary_occurrence, crs=abraidCRS)
+    
     presence <- occurrence
     presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
     absence <- supplementary_occurrence
