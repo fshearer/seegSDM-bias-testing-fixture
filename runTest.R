@@ -9,111 +9,11 @@ runTest <- function (mode,
                      admin_path,
                      covariate_path,
                      discrete,
-                     water_mask,
-                     verbose = TRUE,
-                     max_cpus = 32,
-                     parallel_flag = TRUE) {
-  
-  # Given the locations of: a csv file containing disease occurrence data
-  # (`occurrence_path`, a character), a GeoTIFF raster giving the definitive
-  # extents of the disease (`extent_path`, a character), a csv file containing 
-  # disease occurrence data for other diseases (`supplementary_occurrence_path`,
-  # a character), GeoTIFF rasters giving standardised admin units (`admin0_path`,
-  # `admin1_path`, `admin2_path`) and GeoTIFF rasters giving the covariates to
-  # use (`covariate_path`,  a character vector). Run a predictive model to produce
-  # a risk map (and associated outputs) for the disease.
-  # The file given by `occurrence_path` must contain the columns 'Longitude',
-  # 'Latitude' (giving the coordinates of points), 'Weight' (giving the degree
-  # of weighting to assign to each occurrence record), 'Admin' (giving the
-  # admin level of the record - e.g. 1, 2 or 3 for polygons or -999 for points),
-  # 'GAUL' (the GAUL code corresponding to the admin unit for polygons, or
-  # NA for points) and 'Disease' a numeric identifer for the disease of the occurrence.
-  # The file given by `supplementary_occurrence_path` must contain the columns 
-  # 'Longitude', 'Latitude' (giving the coordinates of points), 'Admin' (giving the
-  # admin level of the record - e.g. 1, 2 or 3 for polygons or -999 for points),
-  # 'GAUL' (the GAUL code corresponding to the admin unit for polygons, or
-  # NA for points) and 'Disease' a numeric identifer for the disease of the occurrence.
-  # To treat any covariates as discrete variables, provide a logical vector
-  # `discrete` with `TRUE` if the covariate is a discrete variable and `FALSE`
-  # otherwise. By default, all covariates are assumed to be continuous.
-  # Set the maximum number of CPUs to use with `max_cpus`. At present runABRAID
-  # runs 64 bootstrap submodels, so the number of cpus used in the cluster will
-  # be set at `min(64, max_cpus)`.
-  
-  # ~~~~~~~~
-  # check inputs are of the correct type and files exist
-  abraidCRS <- crs("+init=epsg:4326")
-  modes <- c("bhatt", "bias_all", "bias_cropped", "bias_cropped_filtered", "uniform")
-  stopifnot(class(mode) == 'character' &&
-              is.element(mode, modes))
-  
-  stopifnot(is.numeric(disease))
-  
-  stopifnot(class(occurrence_path) == 'character' &&
-              file.exists(occurrence_path))
-  
-  stopifnot(class(extent_path) == 'character' &&
-              file.exists(extent_path) && 
-              compareCRS(raster(extent_path), abraidCRS))
-  
-  stopifnot(class(supplementary_occurrence_path) == 'character' &&
-              file.exists(supplementary_occurrence_path))
-  
-  stopifnot(file.exists(admin0_path) && 
-              compareCRS(raster(admin0_path), abraidCRS))
-  
-  stopifnot(file.exists(admin1_path) && 
-              compareCRS(raster(admin1_path), abraidCRS))
-  
-  stopifnot(file.exists(admin2_path) && 
-              compareCRS(raster(admin2_path), abraidCRS))
-  
-  stopifnot(class(unlist(discrete)) == 'logical' &&
-              length(discrete == length(covariate_path)))
-  
-  stopifnot(is.function(load_seegSDM))
-  
-  stopifnot(is.logical(parallel_flag))
-  
-  stopifnot(names(discrete) == names(covariate_path))
-  
-  stopifnot(class(unlist(covariate_path, recursive=TRUE)) == 'character' &&
-              all(file.exists(unlist(covariate_path, recursive=TRUE))) &&
-              all(sapply(sapply(unlist(covariate_path, recursive=TRUE), raster), compareCRS, abraidCRS)))
-  
-  # ~~~~~~~~
-  # load data
-  
-  # occurrence data
-  occurrence <- read.csv(occurrence_path,
-                         stringsAsFactors = FALSE)
-  
-  # check column names are as expected
-  stopifnot(sort(colnames(occurrence)) == sort(c('Admin',
-                                                 'Date',     
-                                                 'Disease',
-                                                 'GAUL',
-                                                 'Latitude',
-                                                 'Longitude',
-                                                 'Weight')))
-  
-  # convert it to a SpatialPointsDataFrame
-  # NOTE: `occurrence` *must* contain columns named 'Latitude' and 'Longitude'
-  occurrence <- occurrence2SPDF(occurrence, crs=abraidCRS)
-  
-  # occurrence data
-  supplementary_occurrence <- read.csv(supplementary_occurrence_path,
-                                       stringsAsFactors = FALSE)
-  
-  # check column names are as expected
-  stopifnot(sort(colnames(supplementary_occurrence)) == sort(c('Admin',
-                                                               'Date',    
-                                                               'Disease',
-                                                               'GAUL',
-                                                               'Latitude',
-                                                               'Longitude')))
+                     water_mask) {
+
   # Functions to assist in the loading of raster data. 
   # This works around the truncation of crs metadata in writen geotiffs.
+  abraidCRS <- crs("+init=epsg:4326")
   abraidStack <- function(paths) {
     s <- stack(paths)
     crs(s) <- abraidCRS
@@ -127,26 +27,29 @@ runTest <- function (mode,
     return (r)
   }
   
-  # convert it to a SpatialPointsDataFrame
-  # NOTE: `occurrence` *must* contain columns named 'Latitude' and 'Longitude'
+  # ~~~~~~~~
+  # load data
+  
+  # occurrence data
+  occurrence <- read.csv(occurrence_path, stringsAsFactors = FALSE)
+  occurrence <- occurrence2SPDF(occurrence, crs=abraidCRS)
+  
+  # occurrence data
+  supplementary_occurrence <- read.csv(supplementary_occurrence_path, stringsAsFactors = FALSE)
   supplementary_occurrence <- occurrence2SPDF(supplementary_occurrence, crs=abraidCRS)
   
   # load the definitve extent raster
   extent <- abraidRaster(extent_path)
   
   # load the admin rasters as a stack
-  # Note the horrible hack of specifying admin 3 as the provided admin 1.
-  # These should be ignored since ABRAID should never contain anything other
-  # than levels 0, 1 and 2
   admin <- abraidStack(admin_path)
   
   # get the required number of cpus
   nboot <- 64
-  ncpu <- min(nboot,
-              max_cpus)
+  ncpu <- nboot
   
   # start the cluster
-  sfInit(parallel = parallel_flag,
+  sfInit(parallel = TRUE,
          cpus = ncpu)
   
   # load seegSDM and dependencies on every cluster
@@ -231,20 +134,16 @@ runTest <- function (mode,
                          gbm.y = 'PA',
                          pred.raster = selectLatestCovariates(covariate_path, load_stack=abraidStack),
                          gbm.coords = c('Longitude', 'Latitude'),
-                         verbose = verbose)
+                         verbose = TRUE)
   
-  if (verbose) {
-    cat('model fitting done\n\n')
-  }
-  
+  cat('model fitting done\n\n')
+
   # get cross-validation statistics in parallel
   stat_lis <- sfLapply(model_list,
                        getStats)
   
-  if (verbose) {
-    cat('statistics extracted\n\n')
-  }
-  
+  cat('statistics extracted\n\n')
+
   # combine and output results
   
   # make a results directory
@@ -324,7 +223,7 @@ runTest <- function (mode,
   preds <- stack(preds)
   
   # summarize predictions
-  preds <- combinePreds(preds, parallel=parallel_flag)
+  preds <- combinePreds(preds, parallel=TRUE)
   
   # stop the cluster
   sfStop()
