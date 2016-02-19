@@ -10,6 +10,7 @@ runTest <- function (mode,
                      covariate_path,
                      discrete,
                      water_mask,
+                     admin_extract_mode="random",
                      crop_bias=TRUE, # used with mode "bias"
                      filter_bias=TRUE, # used with mode "bias"
                      use_weights=TRUE,
@@ -100,6 +101,7 @@ runTest <- function (mode,
                           consensus = extent,
                           admin = admin, 
                           factor = discrete,
+                          admin_mode = admin_extract_mode,
                           load_stack = abraidStack)
     cat('extractBhatt done\n\n')
   } else if (substr(mode, 1, 4) == "bias") {
@@ -144,7 +146,7 @@ runTest <- function (mode,
                           covariates = covariate_path,
                           admin = admin, 
                           factor = discrete,
-                          admin_mode="random")
+                          admin_mode = admin_extract_mode)
   } else {
     exit(1)
   }
