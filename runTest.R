@@ -1,16 +1,18 @@
+library(raster)
+library(sp)
 ## This is fork of runABRAID from SEEG-Oxford/seegSDM @ 0.1-8
 runTest <- function (mode, 
-                       disease,
-                       occurrence_path,
-                       extent_path,
-                       supplementary_occurrence_path,
-                       admin_path,
-                       covariate_path,
-                       discrete,
-                       verbose = TRUE,
-                       max_cpus = 32,
-                       load_seegSDM = function(){ library(seegSDM) },
-                       parallel_flag = TRUE) {
+                     disease_type,
+                     occurrence_path,
+                     extent_path,
+                     supplementary_occurrence_path,
+                     admin_path,
+                     covariate_path,
+                     discrete,
+                     water_mask,
+                     verbose = TRUE,
+                     max_cpus = 32,
+                     parallel_flag = TRUE) {
   
   # Given the locations of: a csv file containing disease occurrence data
   # (`occurrence_path`, a character), a GeoTIFF raster giving the definitive
@@ -41,7 +43,7 @@ runTest <- function (mode,
   # ~~~~~~~~
   # check inputs are of the correct type and files exist
   abraidCRS <- crs("+init=epsg:4326")
-  modes <- readLines(system.file('data/abraid_modes.txt', package='seegSDM'))
+  modes <- c("bhatt", "bias_all", "bias_cropped", "bias_cropped_filtered", "uniform")
   stopifnot(class(mode) == 'character' &&
               is.element(mode, modes))
   
@@ -65,8 +67,6 @@ runTest <- function (mode,
   
   stopifnot(file.exists(admin2_path) && 
               compareCRS(raster(admin2_path), abraidCRS))
-  
-  stopifnot(class(verbose) == 'logical')
   
   stopifnot(class(unlist(discrete)) == 'logical' &&
               length(discrete == length(covariate_path)))
@@ -151,11 +151,9 @@ runTest <- function (mode,
   
   # load seegSDM and dependencies on every cluster
   sfClusterCall(load_seegSDM)
-  
-  if (verbose) {
-    cat('\nseegSDM loaded on cluster\n\n')
-  }
-  
+
+  cat('\nseegSDM loaded on cluster\n\n')
+
   # prepare absence data
   if (mode == 'bhatt') {
     sub <- function(i, pars) {
@@ -195,10 +193,8 @@ runTest <- function (mode,
                           admin = admin, 
                           factor = discrete,
                           load_stack = abraidStack)
-    if (verbose) {
-      cat('extractBhatt done\n\n')
-    }
-  } else if (mode == "all_bias") {
+    cat('extractBhatt done\n\n')
+  } else if (substr(mode, 1, 4) == "bias") {
     presence <- occurrence
     presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
     absence <- supplementary_occurrence
@@ -208,11 +204,8 @@ runTest <- function (mode,
     # create batches
     batches <- replicate(nboot, subsample(all@data, nrow(all), replace=TRUE), simplify=FALSE)
     batches <- lapply(batches, occurrence2SPDF, crs=abraidCRS)
-    
-    if (verbose) {
-      cat('batches ready for extract\n\n')
-    }
-    
+    cat('batches ready for extract\n\n')
+
     # Do extractions
     data_list <- sfLapply(batches,
                           extractBatch,
@@ -224,16 +217,12 @@ runTest <- function (mode,
     exit(1)
   }
   
-  if (verbose) {
-    cat('extraction done\n\n')
-  }
-  
+  cat('extraction done\n\n')
+
   # balance weights
   data_list <- sfLapply(data_list, balanceWeights)
-  if (verbose) {
-    cat('balance done\n\n')
-  }
-  
+  cat('balance done\n\n')
+
   # run BRT submodels in parallel
   model_list <- sfLapply(data_list,
                          runBRT,
@@ -359,6 +348,8 @@ runTest <- function (mode,
               options = c("COMPRESS=DEFLATE",
                           "ZLEVEL=9"),
               overwrite = TRUE)
+  
+  ##TODO add crop/mask
   
   # return an exit code of 0, as in the ABRAID-MP code
   return (0)
