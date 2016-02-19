@@ -6,7 +6,7 @@ function doModel {
 	fi
 	echo "$3_$1"
 	date
-	R --no-save --slave -e "source('runTest.R'); runTest('$3_$1', '$2', '$3', '$4', '$5', '$6', '$7', '$8');" &> "$3_$1.log"
+	R --no-save --slave -e "source('runTest.R'); runTest(name='$3_$1', mode='$2', disease='$3', admin_extract_mode='$4', crop_bias=$5, filter_bias=$6, use_weights=$7, use_temporal_covariates=$8);" &> "$3_$1.log"
 	if [ -d "temp" ]; then
 		rm -rf "temp"
 	fi

@@ -12,6 +12,11 @@ runTest <- function (name,
                      filter_bias=TRUE, # used with mode "bias"
                      use_weights=TRUE,
                      use_temporal_covariates=TRUE) {
+  
+  # Create a temp dir for intermediate rasters
+  dir.create('temp')
+  rasterOptions(tmpdir="temp")
+  
   # Get file paths
   occurrence_path <- paste0(disease,"_data/occurrences.csv")
   extent_path <- paste0(disease,"_data/extent.tif")
