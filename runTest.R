@@ -302,7 +302,16 @@ runTest <- function (name,
 
   if (use_weights) {
     # balance weights
-    data_list <- sfLapply(data_list, balanceWeights)
+    data_list <- sfLapply(data_list, function(data) {
+      # given a mixed spatial data frame of presence and absence data, ensure the 
+      # sum of the weights of the presences and absences are balanced
+      presence <- data$PA == 1
+      absence <- data$PA == 0
+      presence_total <- sum(data[presence, ]$Weight)
+      absence_total <- sum(data[absence, ]$Weight)
+      data[absence, 'Weight'] <- data[absence, ]$Weight * (presence_total / absence_total)
+      return (data)
+    })
     cat('balance done\n\n')
     
     # run BRT submodels in parallel
