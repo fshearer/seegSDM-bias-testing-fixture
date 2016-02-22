@@ -135,9 +135,7 @@ runTest <- function (name,
     "hat"=c(),
     "melio"=c(),
     "nwcl"=c("prec57mn", "prec57mx", "upr_p", "wd0107mn", "wd0107mx"),
-    "nwvl"=c(),
     "owcl"=c(),
-    "owvl"=c(),
     "scrub"=c()
   )
   
