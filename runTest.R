@@ -35,9 +35,7 @@ runTest <- function (name,
     "hat"="parasite",
     "melio"="bacteria",
     "nwcl"="parasite",
-    "nwvl"="parasite",
     "owcl"="parasite",
-    "owvl"="parasite",
     "scrub"="bacteria"
   )[[disease]]
   
@@ -448,7 +446,7 @@ runTest <- function (name,
     
     # generate pseudo-data in parallel
     data_list <- sfLapply(par_list,
-                          abraidBhatt,
+                          seegSDM:::abraidBhatt,
                           occurrence = occurrence,
                           covariates = covariate_path,
                           consensus = extent,
@@ -516,9 +514,21 @@ runTest <- function (name,
       return (ifelse(cells %in% c(100,50), 1, 0))
     })
     absence <- bgSample(selection_mask, n=nrow(presence), prob=crop_bias, replace=TRUE, spatial=FALSE)
-    absence <- xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
+    absence <- seegSDM:::xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
     all <- rbind(presence, absence)
     cat('random bias generated\n\n')
+    # create batches
+    batches <- replicate(nboot, subsample(all@data, nrow(all), replace=TRUE), simplify=FALSE)
+    batches <- lapply(batches, occurrence2SPDF, crs=abraidCRS)
+    cat('batches ready for extract\n\n')
+    
+    # Do extractions
+    data_list <- sfLapply(batches,
+                          extractBatch,
+                          covariates = covariate_path,
+                          admin = admin, 
+                          factor = discrete,
+                          admin_mode = admin_extract_mode)
   } else {
     exit(1)
   }
@@ -527,16 +537,7 @@ runTest <- function (name,
 
   if (use_weights) {
     # balance weights
-    data_list <- sfLapply(data_list, function(data) {
-      # given a mixed spatial data frame of presence and absence data, ensure the 
-      # sum of the weights of the presences and absences are balanced
-      presence <- data$PA == 1
-      absence <- data$PA == 0
-      presence_total <- sum(data[presence, ]$Weight)
-      absence_total <- sum(data[absence, ]$Weight)
-      data[absence, 'Weight'] <- data[absence, ]$Weight * (presence_total / absence_total)
-      return (data)
-    })
+    data_list <- sfLapply(data_list, seegSDM:::balanceWeights)
     cat('balance done\n\n')
     
     # run BRT submodels in parallel
@@ -575,7 +576,7 @@ runTest <- function (name,
   # combine and output results
   
   # make a results directory
-  dir.create(name)
+  dir.create(paste0("results/",name), recursive = TRUE)
   
   # cross-validation statistics (with pairwise-weighted distance sampling)
   stats <- do.call("rbind", stat_lis)
@@ -586,7 +587,7 @@ runTest <- function (name,
   
   # write stats to disk
   write.csv(stats,
-            paste0(name,'/statistics.csv'),
+            paste0("results/",name,'/statistics.csv'),
             na = "",
             row.names = FALSE)
   
@@ -598,7 +599,7 @@ runTest <- function (name,
   
   # output this file
   write.csv(relinf,
-            paste0(name,'/relative_influence.csv'),
+            paste0("results/",name,'/relative_influence.csv'),
             na = "",
             row.names = FALSE)
   
@@ -637,7 +638,7 @@ runTest <- function (name,
   
   # save the results
   write.csv(effects,
-            paste0(name,'/effect_curves.csv'),
+            paste0("results/",name,'/effect_curves.csv'),
             na = "",
             row.names = FALSE)
   
@@ -652,7 +653,7 @@ runTest <- function (name,
   
   # summarize predictions
   preds <- combinePreds(preds, parallel=TRUE)
-  
+
   # stop the cluster
   sfStop()
   
@@ -661,7 +662,7 @@ runTest <- function (name,
   
   # save the mean predicitons and uncerrtainty as rasters
   writeRaster(preds[[1]],
-              paste0(name,'/mean_prediction'),
+              paste0("results/",name,'/mean_prediction'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -669,7 +670,7 @@ runTest <- function (name,
               overwrite = TRUE)
   
   writeRaster(uncertainty,
-              paste0(name,'/prediction_uncertainty'),
+              paste0("results/",name,'/prediction_uncertainty'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -685,7 +686,7 @@ runTest <- function (name,
   uncertainty <- mask(uncertainty, water, inverse=TRUE)
   
   writeRaster(mean,
-              paste0(name,'/mean_prediction_masked'),
+              paste0("results/",name,'/mean_prediction_masked'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -693,7 +694,7 @@ runTest <- function (name,
               overwrite = TRUE)
   
   writeRaster(uncertainty,
-              paste0(name,'/prediction_uncertainty_masked'),
+              paste0("results/",name,'/prediction_uncertainty_masked'),
               format = 'GTiff',
               NAflag = -9999,
               options = c("COMPRESS=DEFLATE",
@@ -702,7 +703,7 @@ runTest <- function (name,
   
   cols <- colorRampPalette(c('#91ab84', '#c3d4bb', '#ffffcb', '#cf93ba', '#a44883'))
   
-  png(paste0(name,'/mean_prediction_masked.png'),
+  png(paste0("results/",name,'/mean_prediction_masked.png'),
       width = 1656,
       height = 667)
   
@@ -725,7 +726,7 @@ runTest <- function (name,
   
   dev.off()
   
-  png(paste0(name,'/prediction_uncertainty_masked.png'),
+  png(paste0("results/",name,'/prediction_uncertainty_masked.png'),
       width = 1656,
       height = 667)
   
@@ -748,7 +749,7 @@ runTest <- function (name,
   
   dev.off()
   
-  png(paste0(name,'/effects.png'),
+  png(paste0("results/",name,'/effects.png'),
       width = 2000,
       height = 2500,
       pointsize = 30)
@@ -758,16 +759,13 @@ runTest <- function (name,
   getEffectPlots(model_list, plot = TRUE)
   
   dev.off()
-  
-  write.csv(presence,
-            paste0(name,'/presence.csv'),
-            na = "",
-            row.names = FALSE)
-  
-  write.csv(absence,
-            paste0(name,'/absence.csv'),
-            na = "",
-            row.names = FALSE)
+     
+  if (exists("all")) {
+    write.csv(all,
+              paste0("results/",name,'/all.csv'),
+              na = "",
+              row.names = FALSE)
+  }
   
   # return an exit code of 0, as in the ABRAID-MP code
   return (0)
