@@ -509,19 +509,22 @@ runTest <- function (name,
                           admin_mode = admin_extract_mode)
   } else if (mode == "uniform") {
     presence <- occurrence
-    presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
-    selection_mask <- calc(extent, function (cells) {
-      return (ifelse(cells %in% c(100,50), 1, 0))
+    batches <- sfLapply(1:64, function(i, presence=presence, extent=extent, abraidCRS=abraidCRS, crop_bias=crop_bias) {
+      presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
+      if (crop_bias) {
+        keep <- c(100,50)
+      } else {
+        keep <- c(100,50,0,-50,-100)
+      }
+      selection_mask <- calc(extent, function (cells) {
+        return (ifelse(cells %in% keep, 1, 0))
+      })
+      absence <- bgSample(selection_mask, n=nrow(presence), prob=TRUE, replace=TRUE, spatial=FALSE)
+      absence <- seegSDM:::xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
+      all <- rbind(presence, absence)
+      return(all)
     })
-    absence <- bgSample(selection_mask, n=nrow(presence), prob=crop_bias, replace=TRUE, spatial=FALSE)
-    absence <- seegSDM:::xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
-    all <- rbind(presence, absence)
     cat('random bias generated\n\n')
-    # create batches
-    batches <- replicate(nboot, subsample(all@data, nrow(all), replace=TRUE), simplify=FALSE)
-    batches <- lapply(batches, occurrence2SPDF, crs=abraidCRS)
-    cat('batches ready for extract\n\n')
-    
     # Do extractions
     data_list <- sfLapply(batches,
                           extractBatch,
@@ -760,9 +763,9 @@ runTest <- function (name,
   
   dev.off()
      
-  if (exists("all")) {
-    write.csv(all,
-              paste0("results/",name,'/all.csv'),
+  if (mode=="bias") {
+    write.csv(absence,
+              paste0("results/",name,'/absence.csv'),
               na = "",
               row.names = FALSE)
   }
