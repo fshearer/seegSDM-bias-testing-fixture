@@ -43,21 +43,7 @@ runTest <- function (name,
   
   all_covs <- list(
     "access"= "covariates/access.tif",
-    "c10"=list(
-      "2001"="covariates/2001.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2002"="covariates/2002.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2003"="covariates/2003.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2004"="covariates/2004.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2005"="covariates/2005.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2006"="covariates/2006.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2007"="covariates/2007.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2008"="covariates/2008.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2009"="covariates/2009.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2010"="covariates/2010.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2011"="covariates/2011.Class10_Grasslands.5km.Percentage.ABRAID.tif",
-      "2012"="covariates/2012.Class10_Grasslands.5km.Percentage.ABRAID.tif"
-    ),
-    "c6"=list(
+    "c06"=list(
       "2001"="covariates/2001.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
       "2002"="covariates/2002.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
       "2003"="covariates/2003.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
@@ -71,7 +57,7 @@ runTest <- function (name,
       "2011"="covariates/2011.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif",
       "2012"="covariates/2012.Class06_Closed_Shrublands.5km.Percentage.ABRAID.tif"
     ),
-    "c7"=list(
+    "c07"=list(
       "2001"="covariates/2001.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
       "2002"="covariates/2002.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
       "2003"="covariates/2003.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
@@ -84,6 +70,20 @@ runTest <- function (name,
       "2010"="covariates/2010.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
       "2011"="covariates/2011.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif",
       "2012"="covariates/2012.Class07_Open_Shrublands.5km.Percentage.ABRAID.tif"
+    ),
+    "c10"=list(
+      "2001"="covariates/2001.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2002"="covariates/2002.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2003"="covariates/2003.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2004"="covariates/2004.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2005"="covariates/2005.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2006"="covariates/2006.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2007"="covariates/2007.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2008"="covariates/2008.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2009"="covariates/2009.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2010"="covariates/2010.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2011"="covariates/2011.Class10_Grasslands.5km.Percentage.ABRAID.tif",
+      "2012"="covariates/2012.Class10_Grasslands.5km.Percentage.ABRAID.tif"
     ),
     "evi_mean"="covariates/EVI_Fixed_Mean_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
     "evi_sd"="covariates/EVI_Fixed_SD_5km_Mean_DEFLATE.ABRAID_Extent.Gapfilled.tif",
@@ -106,9 +106,9 @@ runTest <- function (name,
   
   all_discrete <- list(
     "access"=FALSE,
+    "c06"=FALSE,
+    "c07"=FALSE,
     "c10"=FALSE,
-    "c6"=FALSE,
-    "c7"=FALSE,
     "evi_mean"=FALSE,
     "evi_sd"=FALSE,
     "gecon"=FALSE,
@@ -129,8 +129,8 @@ runTest <- function (name,
   )
 
   covariate_diseases <- list(
-    "cchf"=c("c10", "c6", "c7", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "tcb_mean", "tcw_mean"),
     "chik"=c(),
+    "cchf"=c("c06", "c07", "c10", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "tcb_mean", "tcw_mean"),
     "deng"=c("access", "gecon", "prec57mn", "prec57mx", "tempsuit", "upr_p", "upr_u", "wd0114a0"),
     "hat"=c(),
     "melio"=c(),
