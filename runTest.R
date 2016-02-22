@@ -22,10 +22,10 @@ runTest <- function (name,
   extent_path <- paste0(disease,"_data/extent.tif")
   supplementary_occurrence_path <- paste0(disease,"_data/supplementary_occurrences.csv")
   admin_path <- list(
-    "admin0" <- "admins/admin0.tif",
-    "admin1" <- "admins/admin1.tif",
-    "admin2" <- "admins/admin2.tif",
-    "admin3" <- "admins/admin2.tif" # This one wont be used, but is needed for compatablity with older bits of seegSDM
+    "admin0"="admins/admin0.tif",
+    "admin1"="admins/admin1.tif",
+    "admin2"="admins/admin2.tif",
+    "admin3"="admins/admin2.tif" # This one wont be used, but is needed for compatablity with older bits of seegSDM
   )
   water_mask <- "admins/waterbodies.tif"
   disease_type <- list(
