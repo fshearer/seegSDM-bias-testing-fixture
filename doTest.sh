@@ -19,11 +19,20 @@ function doDisease {
   doModel '1C' 'uniform' "$1" 'random'  'FALSE' 'FALSE' 'TRUE'  'TRUE'
   doModel '2C' 'bias'    "$1" 'random'  'TRUE'  'FALSE' 'TRUE'  'TRUE'
   doModel '2D' 'uniform' "$1" 'random'  'TRUE'  'FALSE' 'TRUE'  'TRUE'
-  doModel '3B' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+  #doModel '3B' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
   doModel '4A' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'FALSE' 'TRUE'
   doModel '5A' 'bias'    "$1" 'average' 'TRUE'  'TRUE'  'TRUE'  'TRUE'
   doModel '6A' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'TRUE'  'FALSE'
 }
+
+doModel '3B' 'bias' "cchf"  'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "chik"  'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "deng"  'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "hat"   'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "melio" 'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "nwcl"  'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "owcl"  'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
+doModel '3B' 'bias' "scrub" 'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
 
 doDisease "cchf"
 doDisease "chik"
