@@ -8,7 +8,7 @@ function doModel {
   echo -e "source('runTest.R')\n" > go.R
   echo -e "runTest(name='$3_$1', mode='$2', disease='$3', admin_extract_mode='$4', crop_bias=$5, filter_bias=$6, use_weights=$7, use_temporal_covariates=$8)\n" >> go.R
   date
-  R --no-save --slave -f go.R &> "$3_$1.log"
+  R --no-save --slave -f go.R &> "results/$3_$1.log"
   rm go.sh
   rm -rf "temp"
 }
