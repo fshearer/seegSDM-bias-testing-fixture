@@ -354,14 +354,14 @@ runTest <- function (name,
   )
 
   covariate_diseases <- list(
-    "cchf"=c("c06", "c07", "c10", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "tcb_mean", "tcw_mean"),
-    "chik"=c("access", "aegypti", "albo", "evi_mean", "evi_sd", "gecon", "worldpop"),
-    "deng"=c("access", "gecon", "prec57mn", "prec57mx", "tempsuit", "upr_p", "upr_u", "wd0114a0"),
-    "hat"=c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c16", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd"),
-    "melio"=c("c12", "evi_mean", "evi_sd", "lst_day_mean", "lst_day_sd", "mod_dem"),
-    "nwcl"=c("prec57mn", "prec57mx", "upr_p", "wd0107mn", "wd0107mx"),
-    "owcl"=c("gecon", "prec57mn", "wd0107mn", "worldpop"),
-    "scrub"=c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd")
+    "cchf"=  c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "chik"=  c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "tempsuit",                                                     "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "deng"=  c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "tempsuit",                                                     "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "hat"=   c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "melio"= c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "nwcl"=  c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "owcl"=  c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop"),
+    "scrub"= c("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c09", "c10", "c11", "c12", "c13", "c14", "c15", "c16", "access", "evi_mean", "evi_sd", "gecon", "lst_day_mean", "lst_day_sd", "lst_night_mean", "lst_night_sd", "mod_dem", "tcb_mean", "tcb_sd", "tcw_mean", "tcw_sd", "worldpop")
   )
   
   covariate_path <- all_covs[covariate_diseases[[disease]]]

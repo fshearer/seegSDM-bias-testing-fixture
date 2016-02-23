@@ -22,18 +22,16 @@ function doDisease {
   doModel '3B' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'TRUE'  'TRUE'
   doModel '4A' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'FALSE' 'TRUE'
   doModel '5A' 'bias'    "$1" 'average' 'TRUE'  'TRUE'  'TRUE'  'TRUE'
-  if [ "$2" == "TRUE" ]; then
-    doModel '6A' 'bias' "$1" 'random' 'TRUE'  'TRUE'  'TRUE'  'FALSE'
-  fi
+  doModel '6A' 'bias'    "$1" 'random'  'TRUE'  'TRUE'  'TRUE'  'FALSE'
 }
 
-doDisease "cchf"  "TRUE"
-doDisease "chik"  "FALSE"
-doDisease "deng"  "FALSE"
-doDisease "hat"   "TRUE"
-doDisease "melio" "TRUE"
-doDisease "nwcl"  "FALSE"
-doDisease "owcl"  "FALSE"
-doDisease "scrub" "TRUE"
+doDisease "cchf"
+doDisease "chik"
+doDisease "deng"
+doDisease "hat"
+doDisease "melio"
+doDisease "nwcl"
+doDisease "owcl"
+doDisease "scrub"
 echo "Done"
 date
