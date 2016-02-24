@@ -508,22 +508,26 @@ runTest <- function (name,
                           factor = discrete,
                           admin_mode = admin_extract_mode)
   } else if (mode == "uniform") {
-    presence <- occurrence
-    batches <- sfLapply(1:64, function(i, presence=presence, extent=extent, abraidCRS=abraidCRS, crop_bias=crop_bias) {
-      presence <- occurrence2SPDF(cbind(PA=1, presence@data), crs=abraidCRS)
-      if (crop_bias) {
+    batches <- sfLapply(1:64, function(i, presence_points=NA, disease_extent=NA, target_crs=NA, limit_sample=NA) {
+      presence_points <- occurrence2SPDF(cbind(PA=1, presence_points@data), crs=target_crs)
+      if (limit_sample) {
         keep <- c(100,50)
       } else {
         keep <- c(100,50,0,-50,-100)
       }
-      selection_mask <- calc(extent, function (cells) {
+      selection_mask <- calc(disease_extent, function (cells) {
         return (ifelse(cells %in% keep, 1, 0))
       })
-      absence <- bgSample(selection_mask, n=nrow(presence), prob=TRUE, replace=TRUE, spatial=FALSE)
-      absence <- seegSDM:::xy2AbraidSPDF(absence, abraidCRS, 0, 1, sample(presence$Date, nrow(presence), replace=TRUE))
-      all <- rbind(presence, absence)
+      absence <- bgSample(selection_mask, n=nrow(presence_points), prob=TRUE, replace=TRUE, spatial=FALSE)
+      absence <- seegSDM:::xy2AbraidSPDF(absence, target_crs, 0, 1, sample(presence_points$Date, nrow(presence_points), replace=TRUE))
+      all <- rbind(presence_points, absence)
       return(all)
-    })
+    },
+      presence_points=occurrence, 
+      disease_extent=extent, 
+      target_crs=abraidCRS, 
+      limit_sample=crop_bias)
+    
     cat('random bias generated\n\n')
     # Do extractions
     data_list <- sfLapply(batches,
