@@ -689,6 +689,8 @@ runTest <- function (name,
   mean <- preds[[1]]
   mean <- mask(mean, extent, maskvalue=-100, updatevalue=9999)
   uncertainty <- mask(uncertainty, extent, maskvalue=-100, updatevalue=9999)
+  mean <- mask(mean, extent)
+  uncertainty <- mask(uncertainty, extent)
   mean <- mask(mean, water, inverse=TRUE)
   uncertainty <- mask(uncertainty, water, inverse=TRUE)
   
@@ -709,53 +711,7 @@ runTest <- function (name,
               overwrite = TRUE)
   
   cols <- colorRampPalette(c('#91ab84', '#c3d4bb', '#ffffcb', '#cf93ba', '#a44883'))
-  
-  png(paste0("results/",name,'/mean_prediction_masked.png'),
-      width = 1656,
-      height = 667)
-  
-  par(mfrow=c(1,1), 
-      mar = c(0, 0, 0, 0),
-      oma = rep(0, 4))
-  plot(mean,
-       zlim = c(9999, 9999),
-       col = colorRampPalette(c('#eaeaea', '#eaeaea'))(2),
-       axes = FALSE,
-       box = FALSE,
-       legend=FALSE)
-  plot(mean,
-       zlim = c(0, 1),
-       col = cols(1000),
-       axes = FALSE,
-       box = FALSE,
-       legend=FALSE,
-       add=TRUE)
-  
-  dev.off()
-  
-  png(paste0("results/",name,'/prediction_uncertainty_masked.png'),
-      width = 1656,
-      height = 667)
-  
-  par(mfrow=c(1,1), 
-      mar = c(0, 0, 0, 0),
-      oma = rep(0, 4))
-  plot(uncertainty,
-       zlim = c(9999, 9999),
-       col = colorRampPalette(c('#eaeaea', '#eaeaea'))(2),
-       axes = FALSE,
-       box = FALSE,
-       legend=FALSE)
-  plot(uncertainty,
-       zlim = c(0, 1),
-       col = cols(1000),
-       axes = FALSE,
-       box = FALSE,
-       legend=FALSE,
-       add=TRUE)
-  
-  dev.off()
-  
+   
   png(paste0("results/",name,'/effects.png'),
       width = 2000,
       height = 2500,
