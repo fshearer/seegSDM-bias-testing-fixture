@@ -12,7 +12,7 @@ for d in diseases:
     print (d)
     sys.stdout.write("[")
     for v in variant:
-        with open("C:/Temp/r/" + d + "_" + v + '/statistics.csv', 'r') as csvfile:
+        with open("all/results/" + d + "_" + v + '/statistics.csv', 'r') as csvfile:
             lines = csv.reader(csvfile, delimiter=',', quotechar='"')
             for row in lines:
                 if skip:
