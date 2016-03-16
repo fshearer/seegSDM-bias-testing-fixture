@@ -9,7 +9,7 @@ sum = 0.0
 count = 0
 skip = True
 for d in diseases:
-    print (d)
+    #print (d)
     sys.stdout.write("[")
     for v in variant:
         with open("all/results/" + d + "_" + v + '/statistics.csv', 'r') as csvfile:

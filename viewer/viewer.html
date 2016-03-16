@@ -1,0 +1,484 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>seegSDM Absence Data Variations Testing - Results Viewer</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="assets/featherlight.min.css" />
+        <link rel="stylesheet" href="assets/twentytwenty.min.css" />
+        <style>
+        /* Reset */
+        html, body, div, span, h1, p, a, article, header {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+        article, header {
+            display: block;
+        }
+        body {
+            line-height: 1;
+        }
+        /* Box Model */
+        *, *:before, *:after {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        /* Basic */
+        @-ms-viewport {
+            width: device-width;
+        }
+        body {
+            -ms-overflow-style: scrollbar;
+        }
+        body {
+            background: #659EC7;
+        }
+        /* Type */
+        body, select {
+            color: white;
+            font-family: "Source Sans Pro", Helvetica, sans-serif;
+            font-size: 15pt;
+            font-weight: 300;
+            letter-spacing: 0.025em;
+            line-height: 1.65;
+            font-size: 11pt;
+        }
+        a {
+            -moz-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+            -webkit-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+            -ms-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+            transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            border-bottom-color: transparent;
+            color: #1569C7 !important;
+        }
+        p {
+            margin: 0 0 2em 0;
+        }
+        h1 {
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            line-height: 1.5;
+            margin: 0 0 1em 0;
+            text-transform: uppercase;
+        }
+        h1 {
+            font-size: 1.25em;
+        }
+        /* Wrapper */
+        #wrapper {
+            position: relative;
+        }
+        #wrapper:after {
+            background: #659EC7;
+            content: '';
+            display: block;
+            height: 100%;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            visibility: hidden;
+            width: 100%;
+            z-index: 1;
+        }
+        body.ie #wrapper:after {
+            background: #659EC7;
+        }
+        /* Header */
+        body {
+            padding: 0 0 4em 0;
+        }
+        #header {
+            -moz-transform: translateY(0);
+            -webkit-transform: translateY(0);
+            -ms-transform: translateY(0);
+            transform: translateY(0);
+            background: #336C95;
+            bottom: -1em;
+            height: 5em;
+            left: 0;
+            line-height: 4em;
+            padding: 0 1.5em;
+            position: fixed;
+            user-select: none;
+            width: 100%;
+            z-index: 10002;
+            border-top: 2px solid white;
+        }
+        #header h1 {
+            display: inline-block;
+            font-size: 1em;
+            line-height: 1;
+            margin: 0;
+            vertical-align: middle;
+        }
+        select {
+            background-color: #659EC7;
+        }
+        /* Main */
+        #main .thumb {
+            border-bottom: 2px solid white;
+        }
+        #main .thumb a {
+            padding: 10px 30px;
+            display: inline-block;
+            border: 0;
+            white-space: nowrap;
+        }
+        #main .thumb a img {
+            width: 300px;
+            height: 121px;
+        }
+        #main .thumb a div {
+            width: 300px;
+            height: 121px;
+            display: inline-block;
+            position: relative;
+        }
+        #main .thumb a span {
+            position: absolute;
+            width: 300px;
+            height: 20px;
+            top: 100px;
+            left: 0;
+            text-align: center;
+        }
+        #main .thumb h1 {
+            display: block;
+            margin: 5px 5px 0 5px;
+        }
+        #main .thumb p {
+            display: block;
+            margin: 0 5px;
+        }
+        .twentytwenty-container {
+            background: #659EC7;
+        }
+        .twentytwenty-before-label:before{content:attr(data-content)!important}
+        .twentytwenty-after-label:before{content:attr(data-content)!important}
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <header id="header">
+                <div style="float: left; display: inline"><h1>Disease:</h1>&nbsp;&nbsp;&nbsp;</div>
+                <div style="float: left; display: inline"><h1>
+                    <select id="disease-select">
+                        <option value="cchf">cchf</option>
+                        <option value="chik">chik</option>
+                        <option value="deng">deng</option>
+                        <option value="hat">hat</option>
+                        <option value="melio">melio</option>
+                        <option value="nwcl">nwcl</option>
+                        <option value="owcl">owcl</option>
+                        <option value="scrub">scrub</option>
+                    </select>
+                </h1></div>
+            </header>
+            <div id="main">
+                <article class="thumb">
+                    <h1>Experiment 1 (pseudo absence methods)</h1>
+                    <p>Bhatt vs sample bias - with balanced weights, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_1A/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_1A/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <p>Uniform random vs sample bias - with balanced weights, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_1C/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_1C/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <p>Bhatt vs uniform random - with balanced weights, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_1A/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1C/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_1A/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_1C/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                </article>
+                <article class="thumb">
+                    <h1>Experiment 2 (absence cropping) </h1>
+                    <p>[Using sample bias data] Uncropped absence vs cropped absence - with balanced weights, random pixels from polygons, temporal covariates</p>                            
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_1B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_2C/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_1B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_2C/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <p>[Using uniform random data] Uncropped absence vs cropped absence - with balanced weights, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_1C/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_2D/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_1C/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_2D/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                </article>
+                <article class="thumb">
+                    <h1>Experiment 3 (absence filtering)</h1>
+                    <p>Unfiltered absence vs filtered absence - with cropped absences, balanced weights, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_2C/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_2C/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                </article>
+                <article class="thumb">
+                    <h1>Experiment 4 (weight balancing)</h1>
+                    <p>Unbalanced weights vs balanced weights - with filtered &amp; cropped absences, random pixels from polygons, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_4A/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_4A/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                </article>
+                <article class="thumb">
+                    <h1>Experiment 5 (polygon extraction method)</h1>
+                    <p>Polyon average vs random polyon pixel - with filtered &amp; cropped absences, balanced weights, temporal covariates</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_5A/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_5A/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                </article>
+                <article class="thumb">
+                    <h1>Experiment 6 (temporal extraction)</h1>
+                    <p>Synoptic covariates vs temporally resolved covariates - with filtered &amp; cropped absences, random pixels from polygons, balanced weights</p>
+                    <a href="#" class="mean">
+                        <div>
+                            <img src="../results/foo_6A/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/mean_prediction_masked.png">
+                            <span>?</span>
+                        </div>
+                    </a>
+                    <a href="#" class="binary">
+                        <div>
+                            <img src="../results/foo_6A/binary_prediction.png">
+                            <span>?</span>
+                        </div>
+                        <div>
+                            <img src="../results/foo_3B/binary_prediction.png">
+                            <span>?/span>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </div>
+        <script>
+            var diseases = ["cchf", "chik", "deng", "hat", "melio", "nwcl", "owcl", "scrub"];
+            var variants = ["1A", "1B", "1C", "2C", "2D", "3B", "4A", "5A", "6A"];
+            var auc = [
+                ["0.8494", "0.7986", "0.7934", "0.8450", "0.7853", "0.8621", "0.8605", "0.8900", "0.8607"],
+                ["0.8872", "0.5945", "0.8164", "0.5889", "0.8119", "0.5909", "0.5885", "0.6272", "0.5950"],
+                ["0.9360", "0.6634", "0.7868", "0.6712", "0.7748", "0.6981", "0.7051", "0.7570", "0.7017"],
+                ["0.9514", "0.6034", "0.6185", "0.6058", "0.7323", "0.6263", "0.6597", "0.6997", "0.6405"],
+                ["0.8250", "0.6370", "0.7279", "0.6360", "0.6871", "0.6932", "0.7000", "0.8328", "0.6823"],
+                ["0.8537", "0.6294", "0.7047", "0.6723", "0.7489", "0.7494", "0.7538", "0.8763", "0.7627"],
+                ["0.8920", "0.7481", "0.7959", "0.8033", "0.7896", "0.8364", "0.8337", "0.9060", "0.8420"],
+                ["0.8106", "0.6098", "0.7344", "0.6722", "0.7503", "0.6454", "0.6594", "0.7168", "0.6677"]
+            ];
+            var threashold = [
+                ["0.9580", "0.8897", "0.9561", "0.8566", "0.9127", "0.8552", "0.6339", "0.9321", "0.8813"],
+                ["0.9665", "0.6192", "0.9515", "0.5485", "0.8749", "0.5579", "0.0366", "0.6126", "0.5971"],
+                ["0.9843", "0.7461", "0.9608", "0.6682", "0.9372", "0.6977", "0.3594", "0.7339", "0.7223"],
+                ["0.9622", "0.5757", "0.9298", "0.4571", "0.7884", "0.5589", "0.4158", "0.4994", "0.5893"],
+                ["0.9776", "0.6533", "0.9715", "0.4612", "0.9151", "0.5702", "0.1658", "0.2892", "0.5697"],
+                ["0.9623", "0.6320", "0.9083", "0.5180", "0.8056", "0.6808", "0.7228", "0.7991", "0.7668"],
+                ["0.9629", "0.8495", "0.9363", "0.7137", "0.8749", "0.9266", "0.9947", "0.9723", "0.9327"],
+                ["0.9541", "0.6790", "0.9600", "0.5494", "0.9160", "0.8213", "0.9484", "0.8902", "0.8464"]
+            ];
+        </script>
+        <script src="assets/jquery.min.js"></script>
+        <script src="assets/jquery.event.move.min.js"></script>
+        <script src="assets/featherlight.min.js"></script>
+        <script src="assets/jquery.twentytwenty.min.js"></script>
+        <script>
+            (function($, diseases, variants, auc, threashold) {
+                $(function() {
+                    $(document).ready(function () {
+                        var updateImgs = function () {
+                            var n = $('select').val();
+                            $('article.thumb a.mean img').each(function (i, image) {
+                                var path = $(image).attr("src").split("/");
+                                path[2] = n +"_"+path[2].split("_")[1];
+                                $(image).attr("src", path.join("/"));
+                                $("span", $(image).parent()).html(auc[diseases.indexOf(n)][variants.indexOf(path[2].split("_")[1])])
+                            });
+                            $('article.thumb a.binary img').each(function (i, image) {
+                                var path = $(image).attr("src").split("/");
+                                path[2] = n +"_"+path[2].split("_")[1];
+                                $(image).attr("src", path.join("/"));
+                                $("span", $(image).parent()).html(threashold[diseases.indexOf(n)][variants.indexOf(path[2].split("_")[1])])
+                            });
+                        };
+                        $('select').change(updateImgs);
+                        var hidden = $('<div style="display:collapsed"></div>');
+                        $("body").append(hidden);
+                        $('article.thumb a').each(function (i, link) {
+                            var images = $("img", link).clone()
+                            images.attr("width", 1656);
+                            images.attr("height", 667);
+                            images.css("width", "1656px");
+                            images.css("height", "667px");
+                            var t_div = $('<div></div>').append(images);
+                            var f_div = $('<div class="twentytwenty-container"></div>').append(t_div);
+                                $(link).featherlight(f_div.html(), {'closeOnClick': "background", 'afterOpen': function () {
+                                var v1 = $($(".featherlight-inner img")[0]).attr("src").split("/")[2].split("_")[1];
+                                var v2 = $($(".featherlight-inner img")[1]).attr("src").split("/")[2].split("_")[1];
+                                var mode = $($(".featherlight-inner img")[0]).attr("src").split("/")[3];
+                                $(".featherlight-inner img").each(function (i, image) {
+                                    var path = $(image).attr("src").split("/");
+                                    path[2] = $('select').val() +"_"+path[2].split("_")[1];
+                                    $(image).attr("src", path.join("/"));
+                                });
+                                var d = $('select').val();
+                                $(".featherlight-inner").css("width", "1656px");
+                                $(".featherlight-inner").css("height", "667px");
+                                $(".featherlight-inner").twentytwenty();
+                                if (mode == "binary_prediction.png") {
+                                    $(".twentytwenty-before-label").attr("data-content", threashold[diseases.indexOf(d)][variants.indexOf(v1)]);
+                                    $(".twentytwenty-after-label").attr("data-content", threashold[diseases.indexOf(d)][variants.indexOf(v2)]);
+                                } else {
+                                    $(".twentytwenty-before-label").attr("data-content", auc[diseases.indexOf(d)][variants.indexOf(v1)]);
+                                    $(".twentytwenty-after-label").attr("data-content", auc[diseases.indexOf(d)][variants.indexOf(v2)]);
+                                }
+                            }});
+                        });
+                        $('select').val("cchf");
+                        updateImgs();
+                    });
+                });
+            })(jQuery, diseases, variants, auc, threashold);
+        </script>
+    </body>
+</html>
